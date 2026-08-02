@@ -1,0 +1,36 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #f8fafc;
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom Utilities for Enterprise Fintech UI */
+@layer components {
+  .enterprise-card {
+    @apply bg-white border border-slate-200 rounded-lg shadow-sm;
+  }
+
+  .enterprise-input {
+    @apply w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15 transition-all duration-150;
+  }
+
+  .enterprise-table-header {
+    @apply bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs font-semibold uppercase tracking-wider px-4 py-3 text-left;
+  }
+
+  .enterprise-table-row {
+    @apply border-b border-slate-100 hover:bg-slate-50/60 transition-colors duration-150 text-sm text-slate-700;
+  }
+}

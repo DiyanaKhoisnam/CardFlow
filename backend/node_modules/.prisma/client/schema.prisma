@@ -1,0 +1,193 @@
+// Prisma schema for Credit Card Management System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Role Enumeration
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+// Card Status Enumeration
+enum CardStatus {
+  ACTIVE
+  FROZEN
+  BLOCKED
+}
+
+// Card Application Status Enumeration
+enum CardApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Card Type Enumeration
+enum CardType {
+  PLATINUM
+  GOLD
+  TITANIUM
+  BLACK_EDITION
+}
+
+// Transaction Status Enumeration
+enum TransactionStatus {
+  COMPLETED
+  PENDING
+  FAILED
+}
+
+// Transaction Category Enumeration
+enum TransactionCategory {
+  SHOPPING
+  DINING
+  TRAVEL
+  ENTERTAINMENT
+  UTILITIES
+  GROCERIES
+  HEALTH
+  OTHER
+}
+
+// Payment Status Enumeration
+enum PaymentStatus {
+  SUCCESS
+  PENDING
+  FAILED
+}
+
+// Reward Status Enumeration
+enum RewardStatus {
+  AVAILABLE
+  REDEEMED
+  EXPIRED
+}
+
+// User Model representing system account holders (Customers & System Admins)
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          Role           @default(CUSTOMER)
+  isSuspended   Boolean        @default(false)
+  refreshTokens RefreshToken[]
+  cards         Card[]
+  transactions  Transaction[]
+  payments      Payment[]
+  rewards       Reward[]
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("users")
+}
+
+// RefreshToken Model for persistent JWT session revocation and token rotation
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+// Credit Card Model
+model Card {
+  id                 String                @id @default(uuid())
+  userId             String
+  user               User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardNumber         String                @unique // Last 4 unmasked, formatted string
+  cardHolder         String
+  cardType           CardType              @default(PLATINUM)
+  expiryDate         String                // Format: MM/YY
+  cvv                String                // 3-digit CVV
+  creditLimit        Float                 @default(10000.00)
+  availableCredit    Float                 @default(7500.00)
+  outstandingBalance Float                 @default(2500.00)
+  status             CardStatus            @default(ACTIVE)
+  applicationStatus  CardApplicationStatus @default(APPROVED)
+  pin                String?               // Hashed card PIN
+  transactions       Transaction[]
+  payments           Payment[]
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@map("cards")
+}
+
+// Transaction Model
+model Transaction {
+  id          String              @id @default(uuid())
+  cardId      String
+  card        Card                @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  merchant    String
+  category    TransactionCategory @default(SHOPPING)
+  amount      Float
+  status      TransactionStatus   @default(COMPLETED)
+  description String?
+  date        DateTime            @default(now())
+  createdAt   DateTime            @default(now())
+
+  @@map("transactions")
+}
+
+// Payment Model for paying card bill balance
+model Payment {
+  id            String        @id @default(uuid())
+  cardId        String
+  card          Card          @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount        Float
+  paymentMethod String        @default("Bank Transfer")
+  status        PaymentStatus @default(SUCCESS)
+  paymentDate   DateTime      @default(now())
+  createdAt     DateTime      @default(now())
+
+  @@map("payments")
+}
+
+// Reward Model catalog & user rewards
+model Reward {
+  id             String       @id @default(uuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  description    String
+  category       String       @default("Voucher")
+  pointsRequired Int
+  status         RewardStatus @default(AVAILABLE)
+  redeemedAt     DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@map("rewards")
+}
+
+// Notification Model
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, WARNING, SUCCESS, ALERT
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}

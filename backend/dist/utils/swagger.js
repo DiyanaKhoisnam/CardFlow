@@ -1,0 +1,49 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setupSwagger = void 0;
+const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const env_1 = require("../config/env");
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'CardFlow REST API',
+            version: '1.0.0',
+            description: 'Enterprise full-stack API supporting user authentication, credit card lifecycle controls, paginated transaction ledgers, rewards catalog, and role-based admin command center.',
+            contact: {
+                name: 'CardFlow Engineering Team',
+            },
+        },
+        servers: [
+            {
+                url: `http://localhost:${env_1.config.port}/api/v1`,
+                description: 'Development Server',
+            },
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
+        security: [
+            {
+                bearerAuth: [],
+            },
+        ],
+    },
+    apis: ['./src/routes/*.ts'],
+};
+const swaggerSpec = (0, swagger_jsdoc_1.default)(options);
+const setupSwagger = (app) => {
+    app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec));
+    console.log(`📚 [Swagger]: Interactive API documentation ready at http://localhost:${env_1.config.port}/api-docs`);
+};
+exports.setupSwagger = setupSwagger;

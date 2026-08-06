@@ -5,7 +5,8 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { useAuth } from './context/AuthContext';
 import { PageLoadingFallback } from './components/common/Skeleton';
 
-// Public Auth Pages
+// Public Pages
+import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
@@ -65,6 +66,12 @@ export const App: React.FC = () => {
   return (
     <Suspense fallback={<PageLoadingFallback />}>
       <Routes>
+        {/* Public Landing Page at Root Route */}
+        <Route
+          path="/"
+          element={isAuthenticated ? <Navigate to={getDefaultRedirect()} replace /> : <LandingPage />}
+        />
+
         {/* Public Authentication Routes */}
         <Route
           path="/login"

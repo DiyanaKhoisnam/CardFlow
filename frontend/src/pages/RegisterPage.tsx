@@ -58,12 +58,17 @@ export const RegisterPage: React.FC = () => {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between py-12 px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="flex items-center justify-between max-w-7xl mx-auto w-full">
+        <Link to="/" className="flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+          &larr; Back to Home
+        </Link>
+
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded bg-blue-600 flex items-center justify-center text-white">
             <CreditCard className="w-3.5 h-3.5" />
           </div>
           <span className="text-sm font-bold text-slate-900">CardFlow</span>
         </div>
+
         <Link to="/login" className="text-xs font-semibold text-blue-600 hover:text-blue-700">
           Already have an account? Sign In &rarr;
         </Link>

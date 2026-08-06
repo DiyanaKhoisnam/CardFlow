@@ -19,7 +19,8 @@ const validateRequest = (schema) => {
                     field: err.path.join('.').replace(/^(body|query|params)\./, ''),
                     message: err.message,
                 }));
-                (0, response_utils_1.sendError)(res, 400, 'Validation failed for input data', formattedErrors);
+                const primaryMessage = formattedErrors[0]?.message || 'Validation failed for input data';
+                (0, response_utils_1.sendError)(res, 400, primaryMessage, formattedErrors);
                 return;
             }
             next(error);

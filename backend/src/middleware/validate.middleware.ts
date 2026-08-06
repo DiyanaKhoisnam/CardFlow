@@ -17,7 +17,8 @@ export const validateRequest = (schema: AnyZodObject) => {
           field: err.path.join('.').replace(/^(body|query|params)\./, ''),
           message: err.message,
         }));
-        sendError(res, 400, 'Validation failed for input data', formattedErrors);
+        const primaryMessage = formattedErrors[0]?.message || 'Validation failed for input data';
+        sendError(res, 400, primaryMessage, formattedErrors);
         return;
       }
       next(error);
